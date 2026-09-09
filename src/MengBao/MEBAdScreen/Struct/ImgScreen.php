@@ -8,7 +8,7 @@ use pocketmine\math\Vector3;
 use pocketmine\Server;
 use pocketmine\world\World;
 
-class AdScreen
+class ImgScreen
 {
     private string $id;
     private World $world;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MengBao\MEBAdScreen\Util;
 
 use MengBao\MEBAdScreen\Main;
-use MengBao\MEBAdScreen\Struct\AdScreen;
+use MengBao\MEBAdScreen\Struct\ImgScreen;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Vector3;
 use pocketmine\world\World;
@@ -28,7 +28,7 @@ class BlockScreenBuilder
      * 构建方块像素屏幕
      * @param array $imagePixels 图片像素数据 [r, g, b]
      */
-    public function buildScreen(AdScreen $screen, array $imagePixels): bool
+    public function buildScreen(ImgScreen $screen, array $imagePixels): bool
     {
         $world = $screen->getWorld();
         $basePos = $screen->getPosition();
@@ -116,7 +116,7 @@ class BlockScreenBuilder
     /**
      * 移除屏幕
      */
-    public function removeScreen(AdScreen $screen): void
+    public function removeScreen(ImgScreen $screen): void
     {
         $world = $screen->getWorld();
         $basePos = $screen->getPosition();

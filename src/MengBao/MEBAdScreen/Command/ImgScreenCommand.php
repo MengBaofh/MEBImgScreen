@@ -8,7 +8,7 @@ use MengBao\MEBAdScreen\Main;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class AdScreenCommand
+class ImgScreenCommand
 {
     private Main $plugin;
 
@@ -19,23 +19,23 @@ class AdScreenCommand
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): bool
     {
-        if (!$sender->hasPermission("adscreen.admin")) {
+        if (!$sender->hasPermission("imgscreen.admin")) {
             $sender->sendMessage("§c你没有权限使用此命令");
             return true;
         }
 
         if (empty($args)) {
-            $sender->sendMessage("§6=== MEBAdScreen 广告屏插件 ===");
-            $sender->sendMessage("§e/adscreen make <图片名> [宽] [高] §7- 快速创建（默认16x16）");
-            $sender->sendMessage("§e/adscreen create <id> <宽> <高> <方向> <图片名> §7- 完整创建");
-            $sender->sendMessage("§e/adscreen remove <id> §7- 删除广告屏");
-            $sender->sendMessage("§e/adscreen list §7- 列出所有广告屏");
-            $sender->sendMessage("§e/adscreen info <id> §7- 查看详细信息");
-            $sender->sendMessage("§e/adscreen reload §7- 重载配置");
+            $sender->sendMessage("§6=== MEBImgScreen 图片屏插件 ===");
+            $sender->sendMessage("§e/imgscreen make <图片名> [宽] [高] §7- 快速创建（默认16x16）");
+            $sender->sendMessage("§e/imgscreen create <id> <宽> <高> <方向> <图片名> §7- 完整创建");
+            $sender->sendMessage("§e/imgscreen remove <id> §7- 删除图片屏");
+            $sender->sendMessage("§e/imgscreen list §7- 列出所有图片屏");
+            $sender->sendMessage("§e/imgscreen info <id> §7- 查看详细信息");
+            $sender->sendMessage("§e/imgscreen reload §7- 重载配置");
             $sender->sendMessage("");
             $sender->sendMessage("§7提示: 将图片放入 plugins/MEBAdScreen/images/");
             $sender->sendMessage("§7提示: 每个方块=1像素，推荐尺寸16-64");
-            $sender->sendMessage("§7示例: /adscreen make logo.png 32 32");
+            $sender->sendMessage("§7示例: /imgscreen make logo.png 32 32");
             return true;
         }
 
@@ -67,14 +67,14 @@ class AdScreenCommand
     private function handleQuickCreate(CommandSender $sender, array $args): bool
     {
         if (!$sender instanceof Player) {
-            $sender->sendMessage("§c只有玩家能创建广告屏");
+            $sender->sendMessage("§c只有玩家能创建图片屏");
             return false;
         }
 
         if (count($args) < 2) {
-            $sender->sendMessage("§c用法: /adscreen make <图片名> [宽] [高]");
-            $sender->sendMessage("§7示例: /adscreen make banner.gif");
-            $sender->sendMessage("§7示例: /adscreen make logo.png 3 2");
+            $sender->sendMessage("§c用法: /imgscreen make <图片名> [宽] [高]");
+            $sender->sendMessage("§7示例: /imgscreen make banner.gif");
+            $sender->sendMessage("§7示例: /imgscreen make logo.png 3 2");
             return false;
         }
 
@@ -97,7 +97,7 @@ class AdScreenCommand
         }
 
         // 自动生成ID
-        $id = "ad_" . time() . "_" . mt_rand(1000, 9999);
+        $id = "img_" . time() . "_" . mt_rand(1000, 9999);
 
         // 根据玩家朝向确定方向
         $direction = $this->getPlayerDirection($sender);
@@ -105,7 +105,7 @@ class AdScreenCommand
         // 获取玩家面前的位置
         $pos = $this->getPositionInFront($sender, 3);
 
-        $sender->sendMessage("§e正在创建 {$width}×{$height} 广告屏...");
+        $sender->sendMessage("§e正在创建 {$width}×{$height} 图片屏...");
 
         $screen = $this->plugin->getScreenManager()->createScreen(
             $id,
@@ -125,7 +125,7 @@ class AdScreenCommand
             return false;
         }
 
-        $sender->sendMessage("§a✔ 广告屏已创建！");
+        $sender->sendMessage("§a✔ 图片屏已创建！");
         $sender->sendMessage("§7ID: §e$id");
         $sender->sendMessage("§7尺寸: §e{$width}×{$height} 方块 §7(每方块=1像素)");
         $sender->sendMessage("§7类型: §7方块像素画");
@@ -137,12 +137,12 @@ class AdScreenCommand
     private function handleCreate(CommandSender $sender, array $args): bool
     {
         if (!$sender instanceof Player) {
-            $sender->sendMessage("§c只有玩家能创建广告屏");
+            $sender->sendMessage("§c只有玩家能创建图片屏");
             return false;
         }
 
         if (count($args) < 6) {
-            $sender->sendMessage("§c用法: /adscreen create <id> <宽> <高> <方向> <图片名>");
+            $sender->sendMessage("§c用法: /imgscreen create <id> <宽> <高> <方向> <图片名>");
             return false;
         }
 
@@ -181,7 +181,7 @@ class AdScreenCommand
             return false;
         }
 
-        $sender->sendMessage("§a已创建广告屏: $id ({$width}x{$height})");
+        $sender->sendMessage("§a已创建图片屏: $id ({$width}x{$height})");
         $sender->sendMessage("§7位置: " . $pos->getFloorX() . ", " . $pos->getFloorY() . ", " . $pos->getFloorZ());
         return true;
     }
@@ -189,7 +189,7 @@ class AdScreenCommand
     private function handleInfo(CommandSender $sender, array $args): bool
     {
         if (count($args) < 2) {
-            $sender->sendMessage("§c用法: /adscreen info <id>");
+            $sender->sendMessage("§c用法: /imgscreen info <id>");
             return false;
         }
 
@@ -197,13 +197,13 @@ class AdScreenCommand
         $screen = $this->plugin->getScreenManager()->getScreen($id);
 
         if ($screen === null) {
-            $sender->sendMessage("§c广告屏不存在: $id");
+            $sender->sendMessage("§c图片屏不存在: $id");
             return false;
         }
 
         $pos = $screen->getPosition();
 
-        $sender->sendMessage("§6=== 广告屏信息 ===");
+        $sender->sendMessage("§6=== 图片屏信息 ===");
         $sender->sendMessage("§eID: §7$id");
         $sender->sendMessage("§e尺寸: §7{$screen->getWidth()}×{$screen->getHeight()} 方块");
         $sender->sendMessage("§e方向: §7{$screen->getDirection()}");
@@ -258,15 +258,15 @@ class AdScreenCommand
     private function handleRemove(CommandSender $sender, array $args): bool
     {
         if (count($args) < 2) {
-            $sender->sendMessage("§c用法: /adscreen remove <id>");
+            $sender->sendMessage("§c用法: /imgscreen remove <id>");
             return false;
         }
 
         $id = $args[1];
         if ($this->plugin->getScreenManager()->removeScreen($id)) {
-            $sender->sendMessage("§a已删除广告屏: $id");
+            $sender->sendMessage("§a已删除图片屏: $id");
         } else {
-            $sender->sendMessage("§c广告屏不存在: $id");
+            $sender->sendMessage("§c图片屏不存在: $id");
         }
         return true;
     }
@@ -275,11 +275,11 @@ class AdScreenCommand
     {
         $screens = $this->plugin->getScreenManager()->getAllScreens();
         if (empty($screens)) {
-            $sender->sendMessage("§e当前没有广告屏");
+            $sender->sendMessage("§e当前没有图片屏");
             return true;
         }
 
-        $sender->sendMessage("§e=== 广告屏列表 ===");
+        $sender->sendMessage("§e=== 图片屏列表 ===");
         foreach ($screens as $screen) {
             $pos = $screen->getPosition();
             $sender->sendMessage(

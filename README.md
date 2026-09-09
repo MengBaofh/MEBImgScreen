@@ -1,4 +1,4 @@
-# MEBAdScreen - 方块像素画广告屏插件
+# MEBImgScreen - 方块像素画广告屏插件
 
 一个 PocketMine-MP 5.x 插件，使用彩色方块自动构建像素画广告屏，将图片转换为游戏内的方块艺术。
 
@@ -27,7 +27,7 @@
 # 2. 站在你想要的位置，面向屏幕应该朝向的方向
 # 3. 输入命令
 
-/adscreen make 你的图片.png
+/imgscreen make 你的图片.png
 
 # 就这样！插件会自动创建 16×16 的方块像素画
 ```
@@ -36,10 +36,10 @@
 
 ```bash
 # 创建 32×32 的大屏
-/adscreen make banner.png 32 32
+/imgscreen make banner.png 32 32
 
 # 创建 48×24 的横幅
-/adscreen make wide.png 48 24
+/imgscreen make wide.png 48 24
 ```
 
 ## 📖 工作原理
@@ -56,12 +56,12 @@
 
 | 命令 | 说明 | 示例 |
 |------|------|------|
-| `/adscreen make <图片名> [宽] [高]` | 快速创建（默认16×16） | `/adscreen make logo.png 32 32` |
-| `/adscreen create <ID> <宽> <高> <方向> <图片名>` | 完整创建 | `/adscreen create ad1 48 48 north banner.png` |
-| `/adscreen list` | 列出所有广告屏 | - |
-| `/adscreen info <ID>` | 查看详细信息 | `/adscreen info ad1` |
-| `/adscreen remove <ID>` | 删除广告屏 | `/adscreen remove ad1` |
-| `/adscreen reload` | 重载配置 | - |
+| `/imgscreen make <图片名> [宽] [高]` | 快速创建（默认16×16） | `/imgscreen make logo.png 32 32` |
+| `/imgscreen create <ID> <宽> <高> <方向> <图片名>` | 完整创建 | `/imgscreen create ad1 48 48 north banner.png` |
+| `/imgscreen list` | 列出所有广告屏 | - |
+| `/imgscreen info <ID>` | 查看详细信息 | `/imgscreen info ad1` |
+| `/imgscreen remove <ID>` | 删除广告屏 | `/imgscreen remove ad1` |
+| `/imgscreen reload` | 重载配置 | - |
 
 ## ⚙️ 配置文件
 
@@ -87,17 +87,17 @@
 
 ### 服务器大厅欢迎屏
 ```bash
-/adscreen make welcome.png 48 48
+/imgscreen make welcome.png 48 48
 ```
 
 ### 商店广告牌
 ```bash
-/adscreen make shop_ad.png 32 24
+/imgscreen make shop_ad.png 32 24
 ```
 
 ### 服务器 Logo
 ```bash
-/adscreen make logo.png 64 64
+/imgscreen make logo.png 64 64
 ```
 
 ## ⚡ 图片优化建议
@@ -132,7 +132,7 @@ A: Minecraft 方块的颜色有限，插件会自动匹配最接近的颜色。�
 A: 理论上可以创建 1×1 到 128×128 的屏幕，但推荐 16×16 到 64×64，太大会导致放置时间过长。
 
 **Q: 可以删除已创建的屏幕吗？**  
-A: 可以，使用 `/adscreen remove <ID>` 命令会自动清除所有方块。
+A: 可以，使用 `/imgscreen remove <ID>` 命令会自动清除所有方块。
 
 ## 📄 许可
 

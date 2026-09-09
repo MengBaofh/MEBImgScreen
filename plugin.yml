@@ -1,21 +1,21 @@
-name: MEBAdScreen
+name: MEBImgScreen
 main: MengBao\MEBAdScreen\Main
 version: 1.0.0
 api:
 - 5.0.0
 load: POSTWORLD
 author: MengBao
-website: https://github.com/MengBaofh/MEBAdScreen
+website: https://github.com/MengBaofh/MEBImgScreen
 description: Use colored blocks to build pixel art screens from images.
 commands:
- adscreen:
-  description: Managing advertisement screens
-  permission: adscreen.admin
-  usage: '/adscreen <make|create|remove|list|info|reload>'
+ imgscreen:
+  description: Managing image screens
+  permission: imgscreen.admin
+  usage: '/imgscreen <make|create|remove|list|info|reload>'
   aliases:
-  - ads
+  - imgs
 
 permissions:
- adscreen.admin:
+ imgscreen.admin:
   default: op
-  description: Manage advertisement screens
+  description: Manage image screens

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MengBao\MEBAdScreen\Manager;
 
 use MengBao\MEBAdScreen\Main;
-use MengBao\MEBAdScreen\Struct\AdScreen;
+use MengBao\MEBAdScreen\Struct\ImgScreen;
 use MengBao\MEBAdScreen\Util\BlockScreenBuilder;
 use MengBao\MEBAdScreen\Util\ImageProcessor;
 use pocketmine\player\Player;
@@ -16,7 +16,7 @@ class ScreenManager
 {
     private Main $plugin;
 
-    /** @var AdScreen[] */
+    /** @var ImgScreen[] */
     private array $screens = [];
 
     private BlockScreenBuilder $screenBuilder;
@@ -47,7 +47,7 @@ class ScreenManager
 
         foreach ($data as $screenData) {
             try {
-                $screen = AdScreen::fromArray($screenData, $this->plugin->getServer());
+                $screen = ImgScreen::fromArray($screenData, $this->plugin->getServer());
                 $this->screens[$screen->getId()] = $screen;
 
                 // 重新构建方块屏幕
@@ -57,7 +57,7 @@ class ScreenManager
             }
         }
 
-        $this->plugin->getLogger()->info("§aLoaded " . count($this->screens) . " ad screens");
+        $this->plugin->getLogger()->info("§aLoaded " . count($this->screens) . " image screens");
     }
 
     public function saveScreens(): void
@@ -76,7 +76,7 @@ class ScreenManager
         // 方块屏幕是静态的，不需要定时任务
     }
 
-    public function createScreen(string $id, World $world, int $x, int $y, int $z, string $direction, int $width, int $height, string $imagePath, bool $autoBuild = true): ?AdScreen
+    public function createScreen(string $id, World $world, int $x, int $y, int $z, string $direction, int $width, int $height, string $imagePath, bool $autoBuild = true): ?ImgScreen
     {
         if (isset($this->screens[$id])) {
             return null;
@@ -86,7 +86,7 @@ class ScreenManager
             return null;
         }
 
-        $screen = new AdScreen($id, $world, $x, $y, $z, $direction, $width, $height, $imagePath);
+        $screen = new ImgScreen($id, $world, $x, $y, $z, $direction, $width, $height, $imagePath);
         $this->screens[$id] = $screen;
 
         // 构建方块屏幕
@@ -105,7 +105,7 @@ class ScreenManager
     /**
      * 重新构建方块屏幕
      */
-    private function rebuildScreen(AdScreen $screen): bool
+    private function rebuildScreen(ImgScreen $screen): bool
     {
         $imagePath = $this->plugin->getDataFolder() . "images/" . $screen->getImagePath();
         if (!file_exists($imagePath)) {
@@ -145,13 +145,13 @@ class ScreenManager
         return true;
     }
 
-    public function getScreen(string $id): ?AdScreen
+    public function getScreen(string $id): ?ImgScreen
     {
         return $this->screens[$id] ?? null;
     }
 
     /**
-     * @return AdScreen[]
+     * @return ImgScreen[]
      */
     public function getAllScreens(): array
     {

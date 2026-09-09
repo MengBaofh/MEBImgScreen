@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MengBao\MEBAdScreen;
 
-use MengBao\MEBAdScreen\Command\AdScreenCommand;
+use MengBao\MEBAdScreen\Command\ImgScreenCommand;
 use MengBao\MEBAdScreen\Manager\ScreenManager;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -17,7 +17,7 @@ class Main extends PluginBase
 
     private Config $config;
     private ScreenManager $screenManager;
-    private AdScreenCommand $commandHandler;
+    private ImgScreenCommand $commandHandler;
 
     public function onLoad(): void
     {
@@ -31,9 +31,9 @@ class Main extends PluginBase
 
         $this->loadConfig();
         $this->screenManager = new ScreenManager($this);
-        $this->commandHandler = new AdScreenCommand($this);
+        $this->commandHandler = new ImgScreenCommand($this);
 
-        $this->getLogger()->info("§aMEBAdScreen v" . self::VERSION . " 已启用");
+        $this->getLogger()->info("§aMEBImgScreen v" . self::VERSION . " 已启用");
         $this->getLogger()->info("§e将图片放入 plugins/MEBAdScreen/images/ 目录");
     }
 
@@ -46,7 +46,7 @@ class Main extends PluginBase
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool
     {
-        if ($command->getName() !== "adscreen") {
+        if ($command->getName() !== "imgscreen") {
             return false;
         }
         return $this->commandHandler->execute($sender, $label, $args);
