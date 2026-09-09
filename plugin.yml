@@ -1,0 +1,19 @@
+name: MEBAdScreen
+main: MengBao\MEBAdScreen\Main
+version: 1.0.0
+api:
+- 5.0.0
+load: POSTWORLD
+author: MengBao
+website: https://github.com/MengBaofh/MEBAdScreen
+description: Display images and GIFs as large advertisement screens using maps with performance optimization.
+commands:
+ adscreen:
+  description: Managing advertisement screens
+  permission: adscreen.admin
+  usage: '/adscreen <create|remove|list|reload>'
+
+permissions:
+ adscreen.admin:
+  default: op
+  description: Manage advertisement screens
