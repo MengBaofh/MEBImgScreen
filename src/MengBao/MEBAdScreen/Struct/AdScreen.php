@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MengBao\MEBAdScreen\Struct;
 
 use pocketmine\math\Vector3;
-use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\World;
 
@@ -21,15 +20,6 @@ class AdScreen
     private int $height;
     private string $imagePath;
 
-    /** @var int[] */
-    private array $mapIds;
-
-    /** @var Player[] */
-    private array $viewers = [];
-
-    private int $currentFrame = 0;
-    private int $frameCount = 1;
-
     public function __construct(
         string $id,
         World $world,
@@ -39,8 +29,7 @@ class AdScreen
         string $direction,
         int $width,
         int $height,
-        string $imagePath,
-        array $mapIds
+        string $imagePath
     ) {
         $this->id = $id;
         $this->world = $world;
@@ -51,7 +40,6 @@ class AdScreen
         $this->width = $width;
         $this->height = $height;
         $this->imagePath = $imagePath;
-        $this->mapIds = $mapIds;
     }
 
     public function getId(): string
@@ -98,57 +86,6 @@ class AdScreen
         return $this->imagePath;
     }
 
-    public function getMapIds(): array
-    {
-        return $this->mapIds;
-    }
-
-    public function addViewer(Player $player): void
-    {
-        $name = $player->getName();
-        if (!isset($this->viewers[$name])) {
-            $this->viewers[$name] = $player;
-        }
-    }
-
-    public function removeViewer(Player $player): void
-    {
-        unset($this->viewers[$player->getName()]);
-    }
-
-    /**
-     * @return Player[]
-     */
-    public function getViewers(): array
-    {
-        return array_filter($this->viewers, fn($p) => $p->isOnline());
-    }
-
-    public function getCurrentFrame(): int
-    {
-        return $this->currentFrame;
-    }
-
-    public function nextFrame(): void
-    {
-        $this->currentFrame = ($this->currentFrame + 1) % $this->frameCount;
-    }
-
-    public function setFrameCount(int $count): void
-    {
-        $this->frameCount = max(1, $count);
-    }
-
-    public function getFrameCount(): int
-    {
-        return $this->frameCount;
-    }
-
-    public function isAnimated(): bool
-    {
-        return $this->frameCount > 1;
-    }
-
     public function toArray(): array
     {
         return [
@@ -160,8 +97,7 @@ class AdScreen
             "direction" => $this->direction,
             "width" => $this->width,
             "height" => $this->height,
-            "imagePath" => $this->imagePath,
-            "mapIds" => $this->mapIds
+            "imagePath" => $this->imagePath
         ];
     }
 
@@ -182,8 +118,7 @@ class AdScreen
             $data["direction"],
             $data["width"],
             $data["height"],
-            $data["imagePath"],
-            $data["mapIds"]
+            $data["imagePath"]
         );
     }
 }

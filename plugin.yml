@@ -6,12 +6,14 @@ api:
 load: POSTWORLD
 author: MengBao
 website: https://github.com/MengBaofh/MEBAdScreen
-description: Display images and GIFs as large advertisement screens using maps with performance optimization.
+description: Use colored blocks to build pixel art screens from images.
 commands:
  adscreen:
   description: Managing advertisement screens
   permission: adscreen.admin
-  usage: '/adscreen <create|remove|list|reload>'
+  usage: '/adscreen <make|create|remove|list|info|reload>'
+  aliases:
+  - ads
 
 permissions:
  adscreen.admin:

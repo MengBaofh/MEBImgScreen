@@ -6,9 +6,8 @@ namespace MengBao\MEBAdScreen\Manager;
 
 use MengBao\MEBAdScreen\Main;
 use MengBao\MEBAdScreen\Struct\AdScreen;
-use MengBao\MEBAdScreen\Task\AnimationTask;
-use MengBao\MEBAdScreen\Task\PlayerDistanceCheckTask;
-use MengBao\MEBAdScreen\Util\ItemFrameBuilder;
+use MengBao\MEBAdScreen\Util\BlockScreenBuilder;
+use MengBao\MEBAdScreen\Util\ImageProcessor;
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use pocketmine\world\World;
@@ -20,18 +19,14 @@ class ScreenManager
     /** @var AdScreen[] */
     private array $screens = [];
 
-    private MapRenderer $mapRenderer;
-
-    private ItemFrameBuilder $frameBuilder;
-
-    private int $nextMapId;
+    private BlockScreenBuilder $screenBuilder;
+    private ImageProcessor $imageProcessor;
 
     public function __construct(Main $plugin)
     {
         $this->plugin = $plugin;
-        $this->nextMapId = (int) $plugin->getPluginConfig()->get("地图起始ID", 1000);
-        $this->mapRenderer = new MapRenderer($plugin);
-        $this->frameBuilder = new ItemFrameBuilder();
+        $this->screenBuilder = new BlockScreenBuilder($plugin);
+        $this->imageProcessor = new ImageProcessor();
 
         $this->loadScreens();
         $this->startTasks();
@@ -54,12 +49,15 @@ class ScreenManager
             try {
                 $screen = AdScreen::fromArray($screenData, $this->plugin->getServer());
                 $this->screens[$screen->getId()] = $screen;
+
+                // 重新构建方块屏幕
+                $this->rebuildScreen($screen);
             } catch (\Exception $e) {
-                $this->plugin->getLogger()->error("加载屏幕失败: " . $e->getMessage());
+                $this->plugin->getLogger()->error("Load screen failed: " . $e->getMessage());
             }
         }
 
-        $this->plugin->getLogger()->info("§a已加载 " . count($this->screens) . " 个广告屏");
+        $this->plugin->getLogger()->info("§aLoaded " . count($this->screens) . " ad screens");
     }
 
     public function saveScreens(): void
@@ -75,16 +73,7 @@ class ScreenManager
 
     private function startTasks(): void
     {
-        $interval = max(1, (int) round(20 * (float) $this->plugin->getPluginConfig()->get("距离检测间隔(s)", 1.0)));
-        $this->plugin->getScheduler()->scheduleRepeatingTask(
-            new PlayerDistanceCheckTask($this->plugin, $this),
-            $interval
-        );
-
-        $this->plugin->getScheduler()->scheduleRepeatingTask(
-            new AnimationTask($this->plugin, $this),
-            (int) $this->plugin->getPluginConfig()->get("GIF帧间隔(tick)", 4)
-        );
+        // 方块屏幕是静态的，不需要定时任务
     }
 
     public function createScreen(string $id, World $world, int $x, int $y, int $z, string $direction, int $width, int $height, string $imagePath, bool $autoBuild = true): ?AdScreen
@@ -97,28 +86,47 @@ class ScreenManager
             return null;
         }
 
-        $mapIds = [];
-        for ($i = 0; $i < $width * $height; $i++) {
-            $mapIds[] = $this->nextMapId++;
-        }
-
-        $screen = new AdScreen($id, $world, $x, $y, $z, $direction, $width, $height, $imagePath, $mapIds);
+        $screen = new AdScreen($id, $world, $x, $y, $z, $direction, $width, $height, $imagePath);
         $this->screens[$id] = $screen;
 
-        // 渲染图像到地图
-        if (!$this->mapRenderer->renderScreen($screen)) {
-            unset($this->screens[$id]);
-            return null;
-        }
-
-        // 自动构建物品展示框
+        // 构建方块屏幕
         if ($autoBuild) {
-            $this->frameBuilder->buildFrameGrid($screen);
+            if (!$this->rebuildScreen($screen)) {
+                unset($this->screens[$id]);
+                return null;
+            }
         }
 
         $this->saveScreens();
 
         return $screen;
+    }
+
+    /**
+     * 重新构建方块屏幕
+     */
+    private function rebuildScreen(AdScreen $screen): bool
+    {
+        $imagePath = $this->plugin->getDataFolder() . "images/" . $screen->getImagePath();
+        if (!file_exists($imagePath)) {
+            $this->plugin->getLogger()->error("Image not found: {$imagePath}");
+            return false;
+        }
+
+        // 加载并调整图片大小到屏幕尺寸（每个方块 = 1 像素）
+        $pixels = $this->imageProcessor->loadAndResizeForBlocks(
+            $imagePath,
+            $screen->getWidth(),
+            $screen->getHeight()
+        );
+
+        if ($pixels === null) {
+            $this->plugin->getLogger()->error("Failed to load image: {$imagePath}");
+            return false;
+        }
+
+        // 构建方块屏幕
+        return $this->screenBuilder->buildScreen($screen, $pixels);
     }
 
     public function removeScreen(string $id): bool
@@ -129,8 +137,8 @@ class ScreenManager
 
         $screen = $this->screens[$id];
 
-        // 移除物品展示框
-        $this->frameBuilder->removeFrameGrid($screen);
+        // 移除方块
+        $this->screenBuilder->removeScreen($screen);
 
         unset($this->screens[$id]);
         $this->saveScreens();
@@ -148,63 +156,6 @@ class ScreenManager
     public function getAllScreens(): array
     {
         return $this->screens;
-    }
-
-    public function getMapRenderer(): MapRenderer
-    {
-        return $this->mapRenderer;
-    }
-
-    public function updatePlayerVisibility(Player $player): void
-    {
-        $maxDistance = (float) $this->plugin->getPluginConfig()->get("最大可视距离", 64);
-        $playerPos = $player->getPosition();
-
-        foreach ($this->screens as $screen) {
-            if ($screen->getWorld()->getFolderName() !== $playerPos->getWorld()->getFolderName()) {
-                continue;
-            }
-
-            $distance = $playerPos->distance($screen->getCenterPosition());
-            $wasViewing = in_array($player, $screen->getViewers(), true);
-
-            if ($distance <= $maxDistance) {
-                if (!$wasViewing) {
-                    $screen->addViewer($player);
-                    // 新观看者，发送初始地图数据
-                    $this->sendInitialMaps($player, $screen);
-                }
-            } else {
-                if ($wasViewing) {
-                    $screen->removeViewer($player);
-                }
-            }
-        }
-    }
-
-    /**
-     * 向玩家发送屏幕的初始地图数据
-     */
-    private function sendInitialMaps(Player $player, AdScreen $screen): void
-    {
-        $currentFrame = $screen->getCurrentFrame();
-
-        foreach ($screen->getMapIds() as $mapId) {
-            $pixels = $this->mapRenderer->getMapData($mapId, $currentFrame);
-            if ($pixels === null) {
-                continue;
-            }
-
-            $pk = new \pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket();
-            $pk->mapId = $mapId;
-            $pk->scale = 0;
-            $pk->width = 128;
-            $pk->height = 128;
-            $pk->dimensionId = 0;
-            $pk->colors = $pixels;
-
-            $player->getNetworkSession()->sendDataPacket($pk);
-        }
     }
 
     public function shutdown(): void

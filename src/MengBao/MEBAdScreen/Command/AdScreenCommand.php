@@ -5,35 +5,28 @@ declare(strict_types=1);
 namespace MengBao\MEBAdScreen\Command;
 
 use MengBao\MEBAdScreen\Main;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class AdScreenCommand extends Command
+class AdScreenCommand
 {
     private Main $plugin;
 
     public function __construct(Main $plugin)
     {
-        parent::__construct(
-            "adscreen",
-            "管理广告屏",
-            "/adscreen <create|remove|list|reload>",
-            ["ads"]
-        );
-        $this->setPermission("adscreen.admin");
         $this->plugin = $plugin;
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): bool
     {
-        if (!$this->testPermission($sender)) {
-            return false;
+        if (!$sender->hasPermission("adscreen.admin")) {
+            $sender->sendMessage("§c你没有权限使用此命令");
+            return true;
         }
 
         if (empty($args)) {
             $sender->sendMessage("§6=== MEBAdScreen 广告屏插件 ===");
-            $sender->sendMessage("§e/adscreen make <图片名> [宽] [高] §7- 快速创建（默认2x2）");
+            $sender->sendMessage("§e/adscreen make <图片名> [宽] [高] §7- 快速创建（默认16x16）");
             $sender->sendMessage("§e/adscreen create <id> <宽> <高> <方向> <图片名> §7- 完整创建");
             $sender->sendMessage("§e/adscreen remove <id> §7- 删除广告屏");
             $sender->sendMessage("§e/adscreen list §7- 列出所有广告屏");
@@ -41,7 +34,8 @@ class AdScreenCommand extends Command
             $sender->sendMessage("§e/adscreen reload §7- 重载配置");
             $sender->sendMessage("");
             $sender->sendMessage("§7提示: 将图片放入 plugins/MEBAdScreen/images/");
-            $sender->sendMessage("§7示例: /adscreen make logo.png 3 2");
+            $sender->sendMessage("§7提示: 每个方块=1像素，推荐尺寸16-64");
+            $sender->sendMessage("§7示例: /adscreen make logo.png 32 32");
             return true;
         }
 
@@ -85,11 +79,12 @@ class AdScreenCommand extends Command
         }
 
         $imageName = $args[1];
-        $width = isset($args[2]) ? (int) $args[2] : 2;
-        $height = isset($args[3]) ? (int) $args[3] : 2;
+        $width = isset($args[2]) ? (int) $args[2] : 16;
+        $height = isset($args[3]) ? (int) $args[3] : 16;
 
-        if ($width < 1 || $width > 4 || $height < 1 || $height > 4) {
-            $sender->sendMessage("§c宽高必须在1-4之间");
+        if ($width < 1 || $width > 128 || $height < 1 || $height > 128) {
+            $sender->sendMessage("§c宽高必须在1-128之间（推荐16-64）");
+            $sender->sendMessage("§7注意：每个方块=1像素，过大会导致放置缓慢");
             return false;
         }
 
@@ -130,13 +125,10 @@ class AdScreenCommand extends Command
             return false;
         }
 
-        $isGif = $screen->isAnimated();
-        $type = $isGif ? "§a动画 ({$screen->getFrameCount()}帧)" : "§7静态";
-
         $sender->sendMessage("§a✔ 广告屏已创建！");
         $sender->sendMessage("§7ID: §e$id");
-        $sender->sendMessage("§7尺寸: §e{$width}×{$height} §7({$screen->getWidth() * 128}×{$screen->getHeight() * 128}px)");
-        $sender->sendMessage("§7类型: $type");
+        $sender->sendMessage("§7尺寸: §e{$width}×{$height} 方块 §7(每方块=1像素)");
+        $sender->sendMessage("§7类型: §7方块像素画");
         $sender->sendMessage("§7位置: §e" . $pos->getFloorX() . ", " . $pos->getFloorY() . ", " . $pos->getFloorZ());
 
         return true;
@@ -160,8 +152,9 @@ class AdScreenCommand extends Command
         $direction = strtolower($args[4]);
         $imageName = $args[5];
 
-        if ($width < 1 || $width > 4 || $height < 1 || $height > 4) {
-            $sender->sendMessage("§c宽高必须在1-4之间");
+        if ($width < 1 || $width > 128 || $height < 1 || $height > 128) {
+            $sender->sendMessage("§c宽高必须在1-128之间（推荐16-64）");
+            $sender->sendMessage("§7注意：每个方块=1像素，过大会导致放置缓慢");
             return false;
         }
 
@@ -190,9 +183,6 @@ class AdScreenCommand extends Command
 
         $sender->sendMessage("§a已创建广告屏: $id ({$width}x{$height})");
         $sender->sendMessage("§7位置: " . $pos->getFloorX() . ", " . $pos->getFloorY() . ", " . $pos->getFloorZ());
-        if ($screen->isAnimated()) {
-            $sender->sendMessage("§7动画帧数: " . $screen->getFrameCount());
-        }
         return true;
     }
 
@@ -212,26 +202,15 @@ class AdScreenCommand extends Command
         }
 
         $pos = $screen->getPosition();
-        $viewers = count($screen->getViewers());
 
         $sender->sendMessage("§6=== 广告屏信息 ===");
         $sender->sendMessage("§eID: §7$id");
-        $sender->sendMessage("§e尺寸: §7{$screen->getWidth()}×{$screen->getHeight()} §8({$screen->getWidth() * 128}×{$screen->getHeight() * 128}px)");
+        $sender->sendMessage("§e尺寸: §7{$screen->getWidth()}×{$screen->getHeight()} 方块");
         $sender->sendMessage("§e方向: §7{$screen->getDirection()}");
         $sender->sendMessage("§e图片: §7{$screen->getImagePath()}");
         $sender->sendMessage("§e位置: §7{$pos->getFloorX()}, {$pos->getFloorY()}, {$pos->getFloorZ()}");
         $sender->sendMessage("§e世界: §7{$screen->getWorld()->getFolderName()}");
-
-        if ($screen->isAnimated()) {
-            $sender->sendMessage("§e类型: §a动画");
-            $sender->sendMessage("§e总帧数: §7{$screen->getFrameCount()}");
-            $sender->sendMessage("§e当前帧: §7{$screen->getCurrentFrame()}");
-        } else {
-            $sender->sendMessage("§e类型: §7静态图片");
-        }
-
-        $sender->sendMessage("§e地图ID: §7" . implode(", ", array_slice($screen->getMapIds(), 0, 5)) . ($screen->getWidth() * $screen->getHeight() > 5 ? "..." : ""));
-        $sender->sendMessage("§e观看者: §7$viewers 人");
+        $sender->sendMessage("§e类型: §7方块像素画");
 
         return true;
     }
@@ -242,10 +221,14 @@ class AdScreenCommand extends Command
     private function getPositionInFront(Player $player, float $distance): \pocketmine\world\Position
     {
         $location = $player->getLocation();
-        $directionVector = $location->getDirectionVector()->normalize()->multiply($distance);
+
+        // 根据 yaw 计算水平方向向量
+        $yaw = deg2rad($location->getYaw());
+        $x = -sin($yaw) * $distance;
+        $z = cos($yaw) * $distance;
 
         return $player->getWorld()->getSafeSpawn(
-            $location->add($directionVector->x, 0, $directionVector->z)
+            $location->add($x, 0, $z)
         );
     }
 
@@ -299,10 +282,9 @@ class AdScreenCommand extends Command
         $sender->sendMessage("§e=== 广告屏列表 ===");
         foreach ($screens as $screen) {
             $pos = $screen->getPosition();
-            $animated = $screen->isAnimated() ? " §a(动画 {$screen->getFrameCount()}帧)" : " §7(静态)";
             $sender->sendMessage(
-                "§7- §e{$screen->getId()} §7({$screen->getWidth()}x{$screen->getHeight()}) " .
-                "at {$pos->getFloorX()}, {$pos->getFloorY()}, {$pos->getFloorZ()}" . $animated
+                "§7- §e{$screen->getId()} §7({$screen->getWidth()}×{$screen->getHeight()}) " .
+                "at {$pos->getFloorX()}, {$pos->getFloorY()}, {$pos->getFloorZ()}"
             );
         }
         return true;

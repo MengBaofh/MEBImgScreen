@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace MengBao\MEBAdScreen;
 
 use MengBao\MEBAdScreen\Command\AdScreenCommand;
-use MengBao\MEBAdScreen\Listener\EventListener;
 use MengBao\MEBAdScreen\Manager\ScreenManager;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 
@@ -16,6 +17,7 @@ class Main extends PluginBase
 
     private Config $config;
     private ScreenManager $screenManager;
+    private AdScreenCommand $commandHandler;
 
     public function onLoad(): void
     {
@@ -26,16 +28,13 @@ class Main extends PluginBase
         @mkdir($this->getDataFolder(), 0777, true);
         @mkdir($this->getDataFolder() . "screens/", 0777, true);
         @mkdir($this->getDataFolder() . "images/", 0777, true);
-        @mkdir($this->getDataFolder() . "cache/", 0777, true);
 
         $this->loadConfig();
         $this->screenManager = new ScreenManager($this);
-
-        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-        $this->getServer()->getCommandMap()->register("adscreen", new AdScreenCommand($this));
+        $this->commandHandler = new AdScreenCommand($this);
 
         $this->getLogger()->info("§aMEBAdScreen v" . self::VERSION . " 已启用");
-        $this->getLogger()->info("§e将图片/GIF放入 plugins/MEBAdScreen/images/ 目录");
+        $this->getLogger()->info("§e将图片放入 plugins/MEBAdScreen/images/ 目录");
     }
 
     public function onDisable(): void
@@ -45,6 +44,14 @@ class Main extends PluginBase
         }
     }
 
+    public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool
+    {
+        if ($command->getName() !== "adscreen") {
+            return false;
+        }
+        return $this->commandHandler->execute($sender, $label, $args);
+    }
+
     private function loadConfig(): void
     {
         $this->config = new Config(
@@ -52,17 +59,7 @@ class Main extends PluginBase
             Config::YAML,
             [
                 "版本" => self::VERSION,
-                "最大可视距离" => 64,
-                "距离检测间隔(s)" => 1.0,
-                "GIF帧间隔(tick)" => 4,
-                "异步渲染" => true,
-                "最大屏幕数" => 50,
-                "地图起始ID" => 1000,
-                "性能模式" => [
-                    "启用" => true,
-                    "玩家少于N人时全速" => 5,
-                    "玩家多时降低帧率" => true
-                ]
+                "最大屏幕数" => 50
             ]
         );
     }
