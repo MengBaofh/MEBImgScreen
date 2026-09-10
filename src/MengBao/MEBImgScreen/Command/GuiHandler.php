@@ -59,7 +59,7 @@ class GuiHandler
         });
 
         $form->setTitle("§l§6MEBImgScreen");
-        $form->setContent("§7选择操作\n§8将图片放入 plugins/MEBImgScreen/images/");
+        $form->setContent("§7选择操作\n§8将图片放入 plugin_data/MEBImgScreen/images/");
         $form->addButton("§a快速创建\n§8默认16x16", 0, "textures/ui/color_plus", "make");
         $form->addButton("§e详细创建\n§8自定义参数", 0, "textures/ui/newOffersIcon", "create");
         $form->addButton("§c删除图片屏\n§8选择ID删除", 0, "textures/ui/trash_default", "remove");
@@ -78,7 +78,7 @@ class GuiHandler
 
         if (empty($images)) {
             $player->sendMessage("§c没有可用的图片");
-            $player->sendMessage("§7请将图片放入: plugins/MEBImgScreen/images/");
+            $player->sendMessage("§7请将图片放入: plugin_data/MEBImgScreen/images/");
             return;
         }
 
@@ -113,7 +113,7 @@ class GuiHandler
 
         if (empty($images)) {
             $player->sendMessage("§c没有可用的图片");
-            $player->sendMessage("§7请将图片放入: plugins/MEBImgScreen/images/");
+            $player->sendMessage("§7请将图片放入: plugin_data/MEBImgScreen/images/");
             return;
         }
 

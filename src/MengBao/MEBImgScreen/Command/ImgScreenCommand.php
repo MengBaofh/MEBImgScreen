@@ -49,7 +49,7 @@ class ImgScreenCommand
                 $sender->sendMessage("§7提示: 安装 MEBForms 插件可使用GUI界面");
             }
             $sender->sendMessage("");
-            $sender->sendMessage("§7提示: 将图片放入 plugins/MEBImgScreen/images/");
+            $sender->sendMessage("§7提示: 将图片放入 plugin_data/MEBImgScreen/images/");
             $sender->sendMessage("§7提示: 每个方块=1像素，推荐尺寸16-64");
             $sender->sendMessage("§7示例: /mebis make logo.png 32 32");
             return true;
@@ -121,7 +121,7 @@ class ImgScreenCommand
         $imagePath = $this->plugin->getDataFolder() . "images/" . $imageName;
         if (!file_exists($imagePath)) {
             $sender->sendMessage("§c图片不存在: $imageName");
-            $sender->sendMessage("§7请将图片放入: plugins/MEBImgScreen/images/");
+            $sender->sendMessage("§7请将图片放入: plugin_data/MEBImgScreen/images/");
             return false;
         }
 
