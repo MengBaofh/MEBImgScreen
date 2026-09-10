@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MengBao\MEBAdScreen\Util;
+namespace MengBao\MEBImgScreen\Util;
 
-use MengBao\MEBAdScreen\Main;
-use MengBao\MEBAdScreen\Struct\ImgScreen;
+use MengBao\MEBImgScreen\Main;
+use MengBao\MEBImgScreen\Struct\ImgScreen;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Vector3;
 use pocketmine\world\World;

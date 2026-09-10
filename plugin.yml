@@ -1,21 +1,21 @@
 name: MEBImgScreen
-main: MengBao\MEBAdScreen\Main
+main: MengBao\MEBImgScreen\Main
 version: 1.0.0
 api:
 - 5.0.0
 load: POSTWORLD
 author: MengBao
 website: https://github.com/MengBaofh/MEBImgScreen
-description: Use colored blocks to build pixel art screens from images.
+description: Use colored blocks to build pixel screens from images.
+softdepend:
+- MEBForms
 commands:
- imgscreen:
+ mebis:
   description: Managing image screens
-  permission: imgscreen.admin
-  usage: '/imgscreen <make|create|remove|list|info|reload>'
-  aliases:
-  - imgs
+  permission: mebis.admin
+  usage: '/mebis [make|create|remove|list|info|reload]'
 
 permissions:
- imgscreen.admin:
+ mebis.admin:
   default: op
   description: Manage image screens

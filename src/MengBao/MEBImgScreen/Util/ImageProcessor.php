@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MengBao\MEBAdScreen\Util;
+namespace MengBao\MEBImgScreen\Util;
 
 class ImageProcessor
 {

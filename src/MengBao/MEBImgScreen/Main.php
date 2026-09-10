@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MengBao\MEBAdScreen;
+namespace MengBao\MEBImgScreen;
 
-use MengBao\MEBAdScreen\Command\ImgScreenCommand;
-use MengBao\MEBAdScreen\Manager\ScreenManager;
+use MengBao\MEBImgScreen\Command\ImgScreenCommand;
+use MengBao\MEBImgScreen\Manager\ScreenManager;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\plugin\PluginBase;
@@ -32,9 +32,7 @@ class Main extends PluginBase
         $this->loadConfig();
         $this->screenManager = new ScreenManager($this);
         $this->commandHandler = new ImgScreenCommand($this);
-
-        $this->getLogger()->info("§aMEBImgScreen v" . self::VERSION . " 已启用");
-        $this->getLogger()->info("§e将图片放入 plugins/MEBAdScreen/images/ 目录");
+        $this->getLogger()->info("§e将图片放入 plugin_data/MEBImgScreen/images/ 目录");
     }
 
     public function onDisable(): void
@@ -46,7 +44,7 @@ class Main extends PluginBase
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool
     {
-        if ($command->getName() !== "imgscreen") {
+        if ($command->getName() !== "mebis") {
             return false;
         }
         return $this->commandHandler->execute($sender, $label, $args);

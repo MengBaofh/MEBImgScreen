@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MengBao\MEBAdScreen\Struct;
+namespace MengBao\MEBImgScreen\Struct;
 
 use pocketmine\math\Vector3;
 use pocketmine\Server;

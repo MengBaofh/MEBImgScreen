@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MengBao\MEBAdScreen\Manager;
+namespace MengBao\MEBImgScreen\Manager;
 
-use MengBao\MEBAdScreen\Main;
-use MengBao\MEBAdScreen\Struct\ImgScreen;
-use MengBao\MEBAdScreen\Util\BlockScreenBuilder;
-use MengBao\MEBAdScreen\Util\ImageProcessor;
+use MengBao\MEBImgScreen\Main;
+use MengBao\MEBImgScreen\Struct\ImgScreen;
+use MengBao\MEBImgScreen\Util\BlockScreenBuilder;
+use MengBao\MEBImgScreen\Util\ImageProcessor;
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use pocketmine\world\World;
