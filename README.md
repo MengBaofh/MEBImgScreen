@@ -1,4 +1,4 @@
-# MEBmebis - 方块像素图片屏插件
+# MEBImgScreen - 方块像素图片屏插件
 
 一个 PocketMine-MP 5.x 插件，使用彩色方块自动构建像素图片屏，将图片转换为游戏内的方块。
 
